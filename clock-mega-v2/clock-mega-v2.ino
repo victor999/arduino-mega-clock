@@ -297,6 +297,15 @@ void loop()
     }
   }
 
+  if(digitalRead(DISABLE_BUZZER))
+  {
+    digitalWrite(DIG8_PIN, HIGH);
+  }
+  else
+  {
+    digitalWrite(DIG8_PIN, LOW);
+  }
+
 
 /////////////////////////////////////////////
 //  set clock
