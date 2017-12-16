@@ -41,7 +41,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define COM1_PIN 37
 #define BUZZ_PIN 12
 
-#define duration 4000 
+#define duration 10 
 
 #define A 6
 #define B 5
@@ -74,7 +74,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {1,0,1,1,1,1,1,0},\
 {1,1,1,0,0,0,0,0},\
 {1,1,1,1,1,1,1,0},\
-{1,1,1,0,0,1,1,0},\
+{1,1,1,1,0,1,1,0},\
 }
 
 byte numbers[10][8] = numbersegments; 
@@ -93,6 +93,8 @@ int digit1 = 0;
 int digit2 = 0;
 int digit3 = 0;
 int digit4 = 0;
+
+int pointsOn = 0;
 
 int requestSetHours = 0;
 int requestSetMinutes = 0;
@@ -229,13 +231,13 @@ void loop()
     if((count % 2) == 0)
     {
       if(digitalRead(SET_ALARM) != LOW)
-        digitalWrite(COM1_PIN, LOW);
+        pointsOn = 0;
       soundAlarm();
     }
     else
     {
       if(digitalRead(SET_ALARM) != LOW)
-        digitalWrite(COM1_PIN, HIGH);
+        pointsOn = 1;
       disableAlarm();
     }
   }
@@ -262,7 +264,7 @@ void loop()
     digit3 = alarmTime.hours() % 10;
     digit4 = alarmTime.hours() / 10;
 
-    digitalWrite(COM1_PIN, HIGH);
+    pointsOn = 1;
 
     //Set Hours
     if(digitalRead(HOURS) == LOW)
@@ -349,7 +351,9 @@ void loop()
   setsegments(digit1, disp1, duration);
   setsegments(digit2, disp2, duration);
   setsegments(digit3, disp3, duration);
-  setsegments(digit4, disp4, duration);  
+  setsegments(digit4, disp4, duration);
+  if(pointsOn)
+    setPoints(duration);
 }
 
 void setsegments(int number, int digit, int ontime)
@@ -358,16 +362,25 @@ void setsegments(int number, int digit, int ontime)
   { 
     if(numbers[number][seg]==1)
     { 
+      //analogWrite(segments[seg], 100);
       digitalWrite(segments[seg], HIGH);
     }
     else 
     {
+      //analogWrite(segments[seg], 0);
       digitalWrite(segments[seg], LOW);
     }
   }
   digitalWrite(digit, HIGH);
   delayMicroseconds(ontime);
   digitalWrite(digit, LOW);
+}
+
+void setPoints(int ontime)
+{
+  digitalWrite(COM1_PIN, HIGH);
+  delayMicroseconds(ontime / 4);
+  digitalWrite(COM1_PIN, LOW);
 }
 
 void soundAlarm()
