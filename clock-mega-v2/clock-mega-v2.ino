@@ -57,6 +57,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define disp3 35
 #define disp4 36
 
+//Buttons
 #define SET_ALARM 29
 #define SET_CLOCK 32
 #define HOURS 31
@@ -230,14 +231,20 @@ void loop()
 
     if((count % 2) == 0)
     {
+      //Disable : for clock
       if(digitalRead(SET_ALARM) != LOW)
         pointsOn = 0;
+
+      //Start alarm sound
       soundAlarm();
     }
     else
     {
+      //Set : for clock
       if(digitalRead(SET_ALARM) != LOW)
         pointsOn = 1;
+
+      //Stop alarm sound
       disableAlarm();
     }
   }
@@ -299,6 +306,7 @@ void loop()
     }
   }
 
+  //Alarm indication
   if(digitalRead(DISABLE_BUZZER))
   {
     digitalWrite(DIG8_PIN, HIGH);
@@ -351,7 +359,9 @@ void loop()
   setsegments(digit1, disp1, duration);
   setsegments(digit2, disp2, duration);
   setsegments(digit3, disp3, duration);
-  setsegments(digit4, disp4, duration);
+  if(digit4 > 0)
+    setsegments(digit4, disp4, duration);
+  
   if(pointsOn)
     setPoints(duration);
 }
@@ -390,21 +400,6 @@ void soundAlarm()
     DateTime currentTime = rtc.now();
     if(currentTime.hour() == alarmTime.hours() && currentTime.minute() == alarmTime.minutes())
     {
-      alarmOn = 1;
-      alarmStart = currentTime;
-    }
-    if(alarmOn)
-    {
-      DateTime alarmEnd = alarmStart + alarmDuration;
-      if(currentTime.hour() == alarmEnd.hour() && currentTime.minute() == alarmEnd.minute())
-      {
-        alarmOn = 0;
-      }
-    }
-
-    if(alarmOn)
-    {
-      Serial.println("Alarm On");
       tone(BUZZ_PIN, 500);
     }
   }
